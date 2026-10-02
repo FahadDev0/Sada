@@ -14,7 +14,7 @@ import type { AnswerValue, Insights, Page, Question, QuestionResult, ResponseIte
 
 // ------------------------------------------------------------------ summary blocks
 
-function TextAnswers({ items }: { items: QuestionResult['textAnswers'] }) {
+function TextAnswers({ items, dates = false }: { items: QuestionResult['textAnswers']; dates?: boolean }) {
   const { t, lang } = useI18n()
   const [expanded, setExpanded] = useState(false)
   const shown = expanded ? items : items.slice(0, 5)
@@ -23,7 +23,7 @@ function TextAnswers({ items }: { items: QuestionResult['textAnswers'] }) {
       <ul className="divide-y divide-line rounded-[var(--radius-field)] border border-line">
         {shown.map((a, i) => (
           <li key={i} className="px-4 py-3">
-            <p className="whitespace-pre-line break-words">{a.value}</p>
+            <p className="whitespace-pre-line break-words">{dates ? formatDate(lang, `${a.value}T12:00:00`, false) : a.value}</p>
             <p className="mt-1 text-xs text-faint">{relativeTime(lang, a.submittedAt)}</p>
           </li>
         ))}
@@ -103,7 +103,7 @@ function QuestionBlock({ result, index, total, question }: {
     body = (
       <>
         <p className="mb-2 text-sm text-muted">{t('results.latestAnswers')}</p>
-        <TextAnswers items={result.textAnswers} />
+        <TextAnswers items={result.textAnswers} dates={result.type === 'DATE'} />
       </>
     )
   }

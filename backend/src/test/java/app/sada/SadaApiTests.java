@@ -39,7 +39,7 @@ class SadaApiTests {
         return Json.write(value);
     }
 
-    private Map<String, Object> body(MvcResult result) {
+    private Map<String, Object> body(MvcResult result) throws Exception {
         return Json.readMap(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
     }
 
