@@ -53,13 +53,57 @@ jobs:
           echo "::error title=Backend build failed::${msg}"
 
   backend-docker:
-    name: Backend Docker image
+    name: Backend Docker image (build + smoke test)
     runs-on: ubuntu-latest
     needs: backend
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: sada
+          POSTGRES_PASSWORD: sada
+          POSTGRES_DB: sada
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sada"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
     steps:
       - uses: actions/checkout@v5
       - name: Build image
         run: docker build -t sada-api ./backend
+      - name: Run container like Render does (DATABASE_URL + PORT)
+        run: |
+          docker run -d --name api --network host -m 512m \
+            -e PORT=8080 \
+            -e DATABASE_URL=postgresql://sada:sada@localhost:5432/sada \
+            -e JWT_SECRET=ci-secret sada-api
+          for i in $(seq 1 60); do curl -fs localhost:8080/actuator/health && break; sleep 2; done
+          echo
+          curl -fs localhost:8080/actuator/health | grep -q UP
+      - name: Smoke test the running API
+        run: |
+          set -e
+          # CORS preflight from a Vercel origin
+          curl -fsi -X OPTIONS localhost:8080/api/surveys \
+            -H "Origin: https://sada-demo.vercel.app" -H "Access-Control-Request-Method: POST" \
+            -H "Access-Control-Request-Headers: authorization,content-type" \
+            | grep -i "access-control-allow-origin: https://sada-demo.vercel.app"
+          TOKEN=$(curl -fs localhost:8080/api/auth/register -H "Content-Type: application/json" \
+            -d '{"name":"CI","email":"ci@example.com","password":"secret-pass-1"}' | jq -r .token)
+          SURVEY=$(curl -fs localhost:8080/api/surveys -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+            -d '{"title":"Smoke","questions":[{"type":"RATING","title":"Rate us","required":true}]}')
+          ID=$(echo "$SURVEY" | jq -r .id); SLUG=$(echo "$SURVEY" | jq -r .slug); QID=$(echo "$SURVEY" | jq -r '.questions[0].id')
+          curl -fs localhost:8080/api/surveys/$ID/status -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"status":"PUBLISHED"}' > /dev/null
+          curl -fs localhost:8080/api/public/surveys/$SLUG/responses -H "Content-Type: application/json" -d "{\"answers\":{\"$QID\":4}}" > /dev/null
+          curl -fs "localhost:8080/api/surveys/$ID/results" -H "Authorization: Bearer $TOKEN" | jq -e '.totalResponses == 1 and .questions[0].average == 4'
+      - name: Container logs
+        if: failure()
+        run: |
+          msg=$(docker logs api 2>&1 | tail -80 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          echo "::error title=Container failed::${msg}"
 
   frontend:
     name: Frontend (typecheck + build)
