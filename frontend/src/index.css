@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Readex Pro", "Segoe UI", Tahoma, system-ui, sans-serif;
+  --font-display: "Reem Kufi", "Readex Pro", system-ui, sans-serif;
+
+  --color-ink: #10201d;
+  --color-ink-soft: #2b3b37;
+  --color-muted: #5a6b66;
+  --color-faint: #8a9994;
+  --color-paper: #f4f7f6;
+  --color-surface: #ffffff;
+  --color-line: #dde4e1;
+  --color-line-strong: #c5d0cc;
+
+  --color-teal: #0e7c74;
+  --color-teal-dark: #095e58;
+  --color-teal-soft: #e2f1ee;
+
+  --color-saffron: #e9a23b;
+  --color-saffron-dark: #a8670f;
+  --color-saffron-soft: #fcf0dc;
+
+  --color-danger: #b42318;
+  --color-danger-soft: #fdecea;
+
+  --radius-field: 10px;
+  --radius-panel: 18px;
+
+  --animate-echo: echo 1.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+
+  @keyframes echo {
+    0% { transform: scale(0.4); opacity: 0.9; }
+    100% { transform: scale(2.6); opacity: 0; }
+  }
+  @keyframes rise {
+    0% { transform: translateY(8px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings: "kern";
+    line-height: 1.6;
+    min-height: 100dvh;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-teal);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-saffron-soft);
+  }
+  input, textarea, select, button {
+    font: inherit;
+    color: inherit;
+  }
+  [dir="rtl"] .flip-rtl {
+    transform: scaleX(-1);
+  }
+}
+
+@layer components {
+  .field {
+    width: 100%;
+    border: 1px solid var(--color-line-strong);
+    background: var(--color-surface);
+    border-radius: var(--radius-field);
+    padding: 0.625rem 0.85rem;
+    transition: border-color 120ms, box-shadow 120ms;
+  }
+  .field:hover {
+    border-color: var(--color-faint);
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--color-teal);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-teal) 18%, transparent);
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--color-danger);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-field);
+    padding: 0.6rem 1.1rem;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+    transition: background-color 120ms, border-color 120ms, color 120ms;
+    cursor: pointer;
+  }
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--color-teal);
+    color: #fff;
+  }
+  .btn-primary:not(:disabled):hover {
+    background: var(--color-teal-dark);
+  }
+  .btn-secondary {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line-strong);
+    color: var(--color-ink);
+  }
+  .btn-secondary:not(:disabled):hover {
+    border-color: var(--color-ink-soft);
+  }
+  .btn-ghost {
+    color: var(--color-ink-soft);
+    padding: 0.5rem 0.7rem;
+  }
+  .btn-ghost:not(:disabled):hover {
+    background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  }
+  .btn-danger {
+    background: var(--color-danger);
+    color: #fff;
+  }
+  .btn-saffron {
+    background: var(--color-saffron);
+    color: var(--color-ink);
+  }
+  .btn-saffron:not(:disabled):hover {
+    background: color-mix(in srgb, var(--color-saffron) 85%, black);
+  }
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    color: var(--color-muted);
+    transition: background-color 120ms, color 120ms;
+    cursor: pointer;
+  }
+  .icon-btn:not(:disabled):hover {
+    background: color-mix(in srgb, var(--color-ink) 7%, transparent);
+    color: var(--color-ink);
+  }
+  .icon-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+  }
+
+  .label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-ink-soft);
+    margin-bottom: 0.35rem;
+  }
+  .hint {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

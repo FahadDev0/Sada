@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: sada
+  datasource:
+    # DATABASE_URL (Neon/Render style "postgresql://user:pass@host/db") is converted
+    # to these three properties at startup — see DatabaseUrl.java.
+    url: ${JDBC_DATABASE_URL:jdbc:postgresql://localhost:5432/sada}
+    username: ${DB_USERNAME:sada}
+    password: ${DB_PASSWORD:sada}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:5}
+      minimum-idle: 1
+      # Neon free tier suspends idle databases; the first connection can take a few seconds.
+      connection-timeout: 30000
+      idle-timeout: 120000
+      max-lifetime: 600000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+  compression:
+    enabled: true
+    mime-types: application/json,text/csv
+  error:
+    include-message: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+app:
+  jwt-secret: ${JWT_SECRET:dev-only-secret-change-me-in-production}
+  jwt-ttl: ${JWT_TTL:7d}
+  cors-allowed-origins: ${CORS_ORIGINS:https://*.vercel.app,http://localhost:5173,http://localhost:4173}
+  google-client-id: ${GOOGLE_CLIENT_ID:}
+  limits:
+    auth-per-minute: ${AUTH_RATE_LIMIT:10}
+    submissions-per-minute: ${SUBMISSION_RATE_LIMIT:15}
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-flash-latest}
+    daily-limit: ${AI_DAILY_LIMIT:30}
