@@ -12,17 +12,17 @@ export function BarList({ options, highlightMax = true }: { options: OptionCount
       {options.map((o) => {
         const isTop = highlightMax && o.count === top && top > 0
         return (
-          <li key={o.label} className="grid gap-1.5 sm:grid-cols-[minmax(0,14rem)_1fr_auto] sm:items-center sm:gap-4">
+          <li key={o.label} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1.5 sm:grid-cols-[minmax(0,14rem)_1fr_auto]">
             <span className="truncate text-sm text-ink-soft" title={o.label}>{o.label}</span>
-            <span className="h-3 rounded-e-[4px] bg-paper" role="presentation">
+            <span className="text-sm tabular-nums text-ink-soft sm:order-3 sm:min-w-24 sm:text-end">
+              <span className="font-semibold text-ink">{num(o.percent)}%</span>
+              <span className="ms-2 text-faint">({num(o.count)})</span>
+            </span>
+            <span className="col-span-2 h-3 rounded-e-[4px] bg-paper sm:order-2 sm:col-span-1" role="presentation">
               <span
                 className={`block h-full rounded-e-[4px] transition-[width] duration-700 ease-out ${isTop ? 'bg-teal' : 'bg-teal/55'}`}
                 style={{ width: `${(o.count / max) * 100}%`, minWidth: o.count > 0 ? 4 : 0 }}
               />
-            </span>
-            <span className="text-sm tabular-nums text-ink-soft sm:min-w-24 sm:text-end">
-              <span className="font-semibold text-ink">{num(o.percent)}%</span>
-              <span className="ms-2 text-faint">({num(o.count)})</span>
             </span>
           </li>
         )

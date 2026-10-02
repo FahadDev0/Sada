@@ -183,7 +183,7 @@ public class SurveyService {
             survey.setThemeColor(request.themeColor().toLowerCase());
         }
         survey.setThankYouMessage(blankToNull(request.thankYouMessage()));
-        survey.setOneResponsePerDevice(request.oneResponsePerDevice());
+        survey.setOneResponsePerDevice(Boolean.TRUE.equals(request.oneResponsePerDevice()));
         survey.setClosesAt(request.closesAt());
     }
 
@@ -289,7 +289,7 @@ public class SurveyService {
         if (description != null && description.length() > 1000) {
             description = description.substring(0, 1000);
         }
-        return new QuestionSpec(type, title, description, in.required(), List.copyOf(options), settings);
+        return new QuestionSpec(type, title, description, Boolean.TRUE.equals(in.required()), List.copyOf(options), settings);
     }
 
     private static ApiException validation(int index, String field, String code) {

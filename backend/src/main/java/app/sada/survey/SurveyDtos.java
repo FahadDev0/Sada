@@ -74,7 +74,8 @@ public final class SurveyDtos {
             @NotNull QuestionType type,
             @NotBlank @Size(max = 500) String title,
             @Size(max = 1000) String description,
-            boolean required,
+            /* Boxed: Jackson 3 rejects missing primitives by default. */
+            Boolean required,
             @Size(max = 50) List<@Size(max = 200) String> options,
             QuestionSettings settings) {
     }
@@ -85,7 +86,7 @@ public final class SurveyDtos {
             @Pattern(regexp = "ar|en") String language,
             @Pattern(regexp = "#[0-9a-fA-F]{6}") String themeColor,
             @Size(max = 1000) String thankYouMessage,
-            boolean oneResponsePerDevice,
+            Boolean oneResponsePerDevice,
             Instant closesAt,
             @Valid @Size(max = 100) List<QuestionInput> questions) {
     }
